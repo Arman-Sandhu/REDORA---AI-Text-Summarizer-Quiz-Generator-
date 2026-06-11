@@ -4,17 +4,22 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct, Filter, FieldCondition, MatchValue
 from fastembed import TextEmbedding
 
-# Initialize Qdrant client
-qdrant_url = os.getenv("QDRANT_URL")
-qdrant_api_key = os.getenv("QDRANT_API_KEY")
+# Initialize Qdrant client lazily to avoid lock conflicts with uvicorn reloader on Windows
+_client = None
 
-if qdrant_url:
-    # Connect to Qdrant Cloud (recommended for production deployment)
-    client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
-else:
-    # Fallback to local storage (default for local development)
-    QDRANT_PATH = os.path.join(os.path.dirname(__file__), "qdrant_storage")
-    client = QdrantClient(path=QDRANT_PATH)
+def get_client():
+    global _client
+    if _client is None:
+        qdrant_url = os.getenv("QDRANT_URL")
+        qdrant_api_key = os.getenv("QDRANT_API_KEY")
+        if qdrant_url:
+            # Connect to Qdrant Cloud (recommended for production deployment)
+            _client = QdrantClient(url=qdrant_url, api_key=qdrant_api_key)
+        else:
+            # Fallback to local storage (default for local development)
+            QDRANT_PATH = os.path.join(os.path.dirname(__file__), "qdrant_storage")
+            _client = QdrantClient(path=QDRANT_PATH)
+    return _client
 
 COLLECTION_NAME = "pdf_knowledge_base"
 EMBEDDING_DIM = 384  # all-MiniLM-L6-v2 dimension
@@ -30,9 +35,9 @@ def get_embedding_model():
 
 def ensure_collection():
     """Create the collection if it doesn't exist."""
-    collections = [c.name for c in client.get_collections().collections]
+    collections = [c.name for c in get_client().get_collections().collections]
     if COLLECTION_NAME not in collections:
-        client.create_collection(
+        get_client().create_collection(
             collection_name=COLLECTION_NAME,
             vectors_config=VectorParams(size=EMBEDDING_DIM, distance=Distance.COSINE),
         )
@@ -82,7 +87,7 @@ def store_document_chunks(doc_id, filename, text):
     # Upsert in batches of 100
     for batch_start in range(0, len(points), 100):
         batch = points[batch_start:batch_start + 100]
-        client.upsert(collection_name=COLLECTION_NAME, points=batch)
+        get_client().upsert(collection_name=COLLECTION_NAME, points=batch)
 
     # Return document-level embedding (average of chunk embeddings)
     doc_embedding = np.mean(embeddings, axis=0).tolist()
@@ -111,7 +116,7 @@ def get_chunks_for_docs(doc_ids, limit=50):
     """Retrieve stored text chunks for given document IDs."""
     all_chunks = []
     for doc_id in doc_ids:
-        results = client.scroll(
+        results = get_client().scroll(
             collection_name=COLLECTION_NAME,
             scroll_filter=Filter(
                 must=[FieldCondition(key="doc_id", match=MatchValue(value=doc_id))]
@@ -137,7 +142,7 @@ def search_by_topic(topic, doc_ids=None, top_k=10):
             ]
         )
 
-    results = client.query_points(
+    results = get_client().query_points(
         collection_name=COLLECTION_NAME,
         query=topic_embedding,
         query_filter=search_filter,
@@ -152,7 +157,7 @@ def search_by_topic(topic, doc_ids=None, top_k=10):
 def check_doc_exists(doc_id):
     """Check if a document already has embeddings stored."""
     try:
-        results = client.scroll(
+        results = get_client().scroll(
             collection_name=COLLECTION_NAME,
             scroll_filter=Filter(
                 must=[FieldCondition(key="doc_id", match=MatchValue(value=doc_id))]
