@@ -1,0 +1,35 @@
+# Python virtual environments
+venv/
+myenv/
+backend/venv/
+backend/myenv/
+
+# Python compiled files & caches
+__pycache__/
+*.pyc
+backend/__pycache__/
+backend/**/*.pyc
+
+# Local databases and vector storage
+*.db
+backend/sql_app.db
+backend/qdrant_storage/
+qdrant_storage/
+
+# Environment variables & Secrets (Crucial!)
+.env
+backend/.env
+frontend/.env
+*.env.local
+.env.*
+
+# Node dependencies & frontend builds
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+
+# System / IDE files
+.DS_Store
+.vscode/
+Thumbs.db
