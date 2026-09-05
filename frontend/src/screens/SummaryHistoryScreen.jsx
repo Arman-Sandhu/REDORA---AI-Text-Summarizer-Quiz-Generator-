@@ -25,10 +25,6 @@ export default function SummaryHistoryScreen() {
     setToastType(type);
   };
 
-  useEffect(() => {
-    fetchSummaries();
-  }, []);
-
   const fetchSummaries = async () => {
     try {
       const response = await axios.get('/api/summaries', {
@@ -42,6 +38,10 @@ export default function SummaryHistoryScreen() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSummaries();
+  }, []);
 
   const handleChatSend = async () => {
     if (!chatInput.trim() || chatLoading || !selectedSummary) return;

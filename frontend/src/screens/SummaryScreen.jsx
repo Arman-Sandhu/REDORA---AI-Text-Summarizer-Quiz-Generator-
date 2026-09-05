@@ -19,11 +19,6 @@ export default function SummaryScreen() {
   
   const chatContainerRef = useRef(null);
 
-  if (!state || !state.sections) {
-    return <Navigate to="/input" />;
-  }
-
-  const { sections, originalText } = state;
   const [mcqSource, setMcqSource] = useState('original');
   const [numMCQs, setNumMCQs] = useState(5);
   const [loading, setLoading] = useState(false);
@@ -45,6 +40,12 @@ export default function SummaryScreen() {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [chatMessages, chatLoading]);
+
+  if (!state || !state.sections) {
+    return <Navigate to="/input" />;
+  }
+
+  const { sections, originalText } = state;
 
   const showToast = (msg, type = 'success') => {
     setToastMessage(msg);

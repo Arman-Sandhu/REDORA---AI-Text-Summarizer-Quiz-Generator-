@@ -263,7 +263,7 @@ Return ONLY a valid JSON array, no extra text, no markdown fences."""
     try:
         groq_client = Groq(api_key=api_key)
         response = groq_client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-20b",
             messages=[
                 {"role": "system", "content": "You are a professional summarizer. You always output pure JSON as requested."},
                 {"role": "user", "content": f"{prompt}\n\nContent:\n{combined_text}"}
@@ -367,7 +367,7 @@ Content:
     try:
         groq_client = Groq(api_key=api_key)
         response = groq_client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-20b",
             messages=[
                 {"role": "system", "content": "You are a professional MCQ generator. You always output pure JSON arrays as requested."},
                 {"role": "user", "content": prompt}
@@ -445,7 +445,7 @@ If the answer is not found in the provided chunks, say "I couldn't find that in 
         try:
             groq_client = Groq(api_key=api_key)
             completion = groq_client.chat.completions.create(
-                model="llama-3.1-8b-instant",
+                model="openai/gpt-oss-20b",
                 messages=messages,
                 temperature=0.3,
                 stream=True,
@@ -498,7 +498,7 @@ Content to summarize:
                     "Authorization": f"Bearer {api_key}"
                 },
                 json={
-                    "model": "llama-3.3-70b-versatile",
+                    "model": "openai/gpt-oss-20b",
                     "messages": [{"role": "user", "content": prompt_text}],
                     "temperature": 0.7,
                     "max_tokens": 4096
@@ -601,7 +601,7 @@ Provide a clear, helpful answer:"""
                     "Authorization": f"Bearer {api_key}",
                 },
                 json={
-                    "model": "llama-3.3-70b-versatile",
+                    "model": "openai/gpt-oss-20b",
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.7,
                     "max_tokens": 2048,

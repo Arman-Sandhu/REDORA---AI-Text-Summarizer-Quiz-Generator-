@@ -12,14 +12,6 @@ export default function HistoryScreen() {
   const [loading, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
   
-  if (!user) {
-    return <Navigate to="/" />;
-  }
-
-  useEffect(() => {
-    fetchHistory();
-  }, []);
-
   const fetchHistory = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -33,6 +25,16 @@ export default function HistoryScreen() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      fetchHistory();
+    }
+  }, [user]);
+
+  if (!user) {
+    return <Navigate to="/" />;
+  }
 
   const handleClearHistory = async () => {
     if (!window.confirm("Are you sure you want to clear your entire quiz history?")) return;

@@ -96,7 +96,7 @@ Content to summarize:
                     "Authorization": f"Bearer {api_key}",
                 },
                 json={
-                    "model": "llama-3.3-70b-versatile",
+                    "model": "openai/gpt-oss-20b",
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.7,
                     "max_tokens": 4096,
@@ -161,7 +161,7 @@ Now teach the student about "{req.topic}" using the above material. Structure yo
                     "Authorization": f"Bearer {api_key}",
                 },
                 json={
-                    "model": "llama-3.3-70b-versatile",
+                    "model": "openai/gpt-oss-20b",
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.7,
                     "max_tokens": 4096,
