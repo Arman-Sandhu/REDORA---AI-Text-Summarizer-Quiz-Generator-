@@ -22,6 +22,7 @@ backend/.env
 frontend/.env
 *.env.local
 .env.*
+!.env.sample
 
 # Node dependencies & frontend builds
 node_modules/
